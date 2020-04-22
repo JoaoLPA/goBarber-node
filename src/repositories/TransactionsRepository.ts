@@ -20,10 +20,16 @@ class TransactionsRepository {
 
   private outcomeValues: number[];
 
+  private incomeTotal: number;
+
+  private outcomeTotal: number;
+
   constructor() {
     this.transactions = [];
     this.incomeValues = [];
     this.outcomeValues = [];
+    this.incomeTotal = 0;
+    this.outcomeTotal = 0;
   }
 
   public all(): Transaction[] {
@@ -35,23 +41,27 @@ class TransactionsRepository {
   }
 
   public getBalance(): Balance {
-    const incomeTransactions = this.transactions.filter(transaction => {
-      return transaction.type === 'income';
+    this.transactions.map(transaction => {
+      if (transaction.type === 'income') {
+        this.incomeValues.push(transaction.value);
+      } else {
+        this.outcomeValues.push(transaction.value);
+      }
     });
-    incomeTransactions.forEach(item => this.incomeValues.push(item.value));
-    const incomeTotal = this.incomeValues.reduce((acc, tot) => acc + tot);
 
-    const outcomeTransactions = this.transactions.filter(transaction => {
-      return transaction.type === 'outcome';
-    });
-    outcomeTransactions.forEach(item => this.outcomeValues.push(item.value));
-    const outcomeTotal = this.outcomeValues.reduce((acc, tot) => acc + tot);
+    if (this.incomeValues.length > 0) {
+      this.incomeTotal = this.incomeValues.reduce((acc, val) => acc + val);
+    }
 
-    const total = incomeTotal - outcomeTotal;
+    if (this.outcomeValues.length > 0) {
+      this.outcomeTotal = this.outcomeValues.reduce((acc, val) => acc + val);
+    }
+
+    const total = this.incomeTotal - this.outcomeTotal;
 
     const balance: Balance = {
-      income: incomeTotal,
-      outcome: outcomeTotal,
+      income: this.incomeTotal,
+      outcome: this.outcomeTotal,
       total,
     };
 

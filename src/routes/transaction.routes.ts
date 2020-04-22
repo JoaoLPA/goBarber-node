@@ -12,7 +12,7 @@ transactionRouter.get('/', (request, response) => {
     const transactions = transactionRepository.all();
     const balance = transactionRepository.getBalance();
 
-    return response.json(transactions);
+    return response.json({ transactions, balance });
   } catch (err) {
     return response.status(400).json({ error: err.message });
   }
@@ -28,7 +28,7 @@ transactionRouter.post('/', (request, response) => {
 
     const transaction = createTransaction.execute({ title, value, type });
 
-    response.json(transaction);
+    response.status(200).json(transaction);
   } catch (err) {
     return response.status(400).json({ error: err.message });
   }
